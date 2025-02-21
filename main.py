@@ -44,30 +44,23 @@ def extract_content(url):
 
 
 # **Persistent Headless Chrome Setup**
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
+def get_driver():
+    """Initialize Chrome WebDriver in headless mode for Render."""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Correct path for Render
 
-# Global driver setup (created once)
-try:
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-except Exception as e:
-    print(f"Failed to initialize Selenium: {e}")
-    driver = None  # Handle case where Selenium setup fails
+    service = Service(ChromeDriverManager().install())  # Use ChromeDriverManager
+    return webdriver.Chrome(service=service, options=chrome_options)
 
 
 @bills_router.get("/get_bills")
 async def get_bills():
     """Fetches latest bills from PRS India website."""
     try:
-        # Set up a fresh WebDriver instance
-        options = Options()
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver = get_driver()  # ✅ Use get_driver()
         driver.get("https://prsindia.org/billtrack")
         driver.implicitly_wait(10)
 

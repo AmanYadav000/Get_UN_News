@@ -3,10 +3,6 @@ import json
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import uvicorn
 
@@ -43,29 +39,15 @@ def extract_content(url):
         return f"Error fetching content: {str(e)}"
 
 
-def get_driver():
-    """Initialize Chrome WebDriver with `webdriver_manager` to avoid manual installation issues."""
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-
-    # Auto-download the correct ChromeDriver
-    service = Service(ChromeDriverManager().install())
-    return webdriver.Chrome(service=service, options=chrome_options)
-
-
 @bills_router.get("/get_bills")
 async def get_bills():
     """Fetches latest bills from PRS India website."""
     try:
-        driver = get_driver()
-        driver.get("https://prsindia.org/billtrack")
-        driver.implicitly_wait(10)
+        response = requests.get("https://prsindia.org/billtrack", timeout=10)
+        if response.status_code != 200:
+            return JSONResponse(content={"error": f"Failed to fetch bills. Status code: {response.status_code}"}, status_code=500)
 
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        driver.quit()  # Close the driver after use
-
+        soup = BeautifulSoup(response.text, 'html.parser')
         bill_rows = soup.find_all('div', class_='views-row')
         bills = []
 

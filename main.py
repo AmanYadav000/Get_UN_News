@@ -44,23 +44,22 @@ def extract_content(url):
 
 
 def get_driver():
-    """Initialize Chrome WebDriver in headless mode for Render using preinstalled paths."""
+    """Initialize Chrome WebDriver with `webdriver_manager` to avoid manual installation issues."""
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/usr/bin/google-chrome"  # Preinstalled Chrome path
 
-    service = Service("/usr/local/bin/chromedriver")  # Preinstalled ChromeDriver path
+    # Auto-download the correct ChromeDriver
+    service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=chrome_options)
-
 
 
 @bills_router.get("/get_bills")
 async def get_bills():
     """Fetches latest bills from PRS India website."""
     try:
-        driver = get_driver()  # ✅ Use get_driver()
+        driver = get_driver()
         driver.get("https://prsindia.org/billtrack")
         driver.implicitly_wait(10)
 

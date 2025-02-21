@@ -14,6 +14,3 @@ unzip /usr/local/bin/chromedriver -d /usr/local/bin/
 chmod +x /usr/local/bin/chromedriver
 
 echo "Chrome and ChromeDriver installed successfully."
-
-# Start the application
-exec python main.py

@@ -43,17 +43,17 @@ def extract_content(url):
         return f"Error fetching content: {str(e)}"
 
 
-# **Persistent Headless Chrome Setup**
 def get_driver():
-    """Initialize Chrome WebDriver in headless mode for Render."""
+    """Initialize Chrome WebDriver in headless mode for Render using preinstalled paths."""
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/usr/bin/google-chrome"  # Correct path for Render
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Preinstalled Chrome path
 
-    service = Service(ChromeDriverManager().install())  # Use ChromeDriverManager
+    service = Service("/usr/local/bin/chromedriver")  # Preinstalled ChromeDriver path
     return webdriver.Chrome(service=service, options=chrome_options)
+
 
 
 @bills_router.get("/get_bills")
